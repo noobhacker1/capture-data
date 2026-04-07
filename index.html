@@ -36,6 +36,18 @@
             <tbody>
             <tr>
                 <td align="right">
+                    <span class="field-validation-valid" data-valmsg-for="ApplyingFor" data-valmsg-replace="false">!</span> Applying For<div class="mandatory-indicator">&nbsp;*</div>
+                </td>
+                <td>
+                    <select class="dropdown-edit" id="ApplyingFor" name="ApplyingFor">
+                        <option value="">Please select</option>
+                        <option value="bachelor">Bachelor</option>
+                        <option value="masters">Masters</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">
                     <span class="field-validation-valid" data-valmsg-for="Lastname" data-valmsg-replace="false">!</span> Last name<div class="mandatory-indicator">&nbsp;*</div>
                 </td>
                 <td>
@@ -1775,7 +1787,8 @@ function downloadFormAsJSON() {
     const form = document.querySelector('form');
     
     // Create an object to store form data
-    const formData = {};
+    const applicantData = {};
+    let applyingFor = '';
     
     // Get all form inputs, textareas, and selects
     const formElements = form.querySelectorAll('input, textarea, select');
@@ -1794,17 +1807,29 @@ function downloadFormAsJSON() {
             filename = `${element.value}.json`;
         }
         
+        // Handle the ApplyingFor dropdown separately
+        if (element.name === 'ApplyingFor') {
+            applyingFor = element.value;
+            return;
+        }
+        
         // For date fields, convert to mm/dd/yyyy format
         if (element.type === 'date' && element.name && element.value) {
             const dateValue = element.value; // Format: yyyy-mm-dd
             const [year, month, day] = dateValue.split('-');
-            formData[element.name] = `${month}/${day}/${year}`; // Use full year
+            applicantData[element.name] = `${month}/${day}/${year}`; // Use full year
         } 
         // For all other fields, just get the value
         else if (element.name) {
-            formData[element.name] = element.value;
+            applicantData[element.name] = element.value;
         }
     });
+
+    // Build the final nested JSON structure
+    const formData = {
+        applying_for: applyingFor,
+        applicant_data: applicantData
+    };
     
     // Convert to JSON string
     const jsonString = JSON.stringify(formData, null, 2);
